@@ -1,0 +1,6 @@
+0.0: (move r1 D P1)
+1.0: (monitor r1 P1)
+2.0: (move r1 P1 D)
+3.0: (move r1 D P2)
+4.0: (water r1 P2)
+5.0: (move r1 P2 D)

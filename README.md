@@ -1,4 +1,4 @@
-# Agricultural Robot Energy Management 🚜⚡
+#  Agricultural Robotics – Energy Constrained Field Operations🚜⚡
 
 **Course:** Artificial Intelligence for Robotics II (AI4R2)  
 **Program:** Robotics Engineering, University of Genoa (UniGe)  

@@ -1,4 +1,4 @@
-# Agricultural Robot Energy Management 🚜⚡
+#  Agricultural Robotics – Energy Constrained Field Operations🚜⚡
 
 **Course:** Artificial Intelligence for Robotics II (AI4R2)  
 **Program:** Robotics Engineering, University of Genoa (UniGe)  
@@ -8,8 +8,8 @@
 This project addresses the energy management and scheduling of an agricultural robot using Automated Planning (PDDL). The robot navigates a topological map of fields (represented as a graph) to perform tasks such as monitoring, watering, fertilizing, and harvesting, while strictly managing its finite battery capacity.
 
 The project is structured into two main parts:
-1. **Q1: Discrete Numeric Model** (Completed)
-2. **Q2: Continuous Time Model & PDDL+** (To be added)
+1. **Q1: Discrete Numeric Model** 
+2. **Q2: Continuous Time Model & PDDL+** 
 
 ---
 

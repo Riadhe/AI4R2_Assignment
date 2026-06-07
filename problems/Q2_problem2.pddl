@@ -25,7 +25,14 @@
     (connected P2 P4) (connected P4 P2)
     (connected P3 P4) (connected P4 P3)
 
- ;; Move Times (Scaled down by 5 for faster search)
+    ;; Terrain Types
+    (flat D P1) (flat P1 D)
+    (flat D P2) (flat P2 D)
+    
+    (muddy P1 P3) (muddy P3 P1)
+    (muddy P2 P4) (muddy P4 P2)
+
+    ;; Move Times (Scaled down by 5 for faster search)
     (= (move-time D P1) 1.0)  (= (move-time P1 D) 1.0)
     (= (move-time D P2) 1.0)  (= (move-time P2 D) 1.0)
     (= (move-time P1 P3) 2.0) (= (move-time P3 P1) 2.0)

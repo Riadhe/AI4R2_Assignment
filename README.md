@@ -53,3 +53,33 @@ Both generated plans have been successfully validated using the VAL tool. To ver
 ```bash
 "/c/Users/bahri/AppData/Roaming/Code/User/globalStorage/jan-dolejsi.pddl/val/Val-20210401
 ```
+## Problem 2 (Q2): Continuous Time & Energy Dynamics (PDDL+)
+
+In this section, the discrete energy model from Q1 is upgraded to a continuous time model using PDDL+. The robot's operations and navigation are now time-dependent, and the energy consumption is handled continuously.
+
+### What has been implemented:
+* **Continuous Processes (`:process`):** Implemented background processes to continuously drain the battery while the robot is moving or operating, and to recharge it when docked.
+* **Safety Events (`:event`):** * `critical-depletion`: Automatically triggers a failure state if the battery drops to 0, forcing the planner to find safe paths.
+  * `stop-overcharge`: Automatically cuts off the recharging process when the battery reaches its maximum capacity.
+* **Action Splitting (Time Dynamics):** To bypass the ENHSP parser limitations with mixed durative actions and processes, navigation and operations were logically split into instantaneous `start` and `stop` actions managed by a continuous `time-spent` counter.
+
+### How to Run the Code
+We use the **ENHSP** planner (specifically supporting PDDL+) with the Greedy Best-First Search (`gbfs`) engine. 
+
+**Run Problem 1 (Sufficient Energy):**
+```bash
+java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain_q2.pddl -f problems/p1_q2.pddl -s gbfs
+```
+**Run Problem 2 (Recharge Required):**
+```bash
+java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain_q2.pddl -f problems/p2_q2.pddl -s gbfs
+```
+### Visualizing the Plan : 
+To view the generated plans with a Gantt chart and battery consumption curves, you can use the PDDL Extension by Jan Dolejší in VS Code:
+
+Ensure the PDDL extension is installed.
+
+Set the custom planner in your settings.json with the following syntax:
+"syntax": "$(planner) -jar \"${workspaceFolder}/tools/enhsp/enhsp-dist/enhsp.jar\" -o $(domain) -f $(problem) -s gbfs"
+
+Open the problem file (p1_q2.pddl or p2_q2.pddl) and run the planner (Alt + P). Click the Visualize icon in the output panel.

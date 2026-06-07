@@ -8,6 +8,8 @@
     (robot-at ?r - robot ?l - location)
     (connected ?l1 ?l2 - location)
     (is-dock ?l - location)
+    (flat ?l1 ?l2 - location)
+    (muddy ?l1 ?l2 - location)
     
     (needs-monitor ?l - location)
     (needs-water ?l - location)
@@ -235,12 +237,29 @@
   ;; CONTINUOUS PROCESSES (Time & Energy Dynamics)
   ;; =========================================================
 
-  (:process process-moving
-    :parameters (?r - robot)
-    :precondition (moving ?r)
+  (:process process-moving-flat
+    :parameters (?r - robot ?from ?to - location)
+    :precondition (and 
+      (moving ?r) 
+      (going ?r ?from ?to) 
+      (flat ?from ?to)
+    )
     :effect (and
       (increase (time-spent ?r) (* #t 1.0)) 
-      (decrease (battery ?r) (* #t 10.0))
+      (decrease (battery ?r) (* #t 5.0)) 
+    )
+  )
+
+  (:process process-moving-muddy
+    :parameters (?r - robot ?from ?to - location)
+    :precondition (and 
+      (moving ?r) 
+      (going ?r ?from ?to) 
+      (muddy ?from ?to)
+    )
+    :effect (and
+      (increase (time-spent ?r) (* #t 1.0)) 
+      (decrease (battery ?r) (* #t 15.0)) 
     )
   )
 

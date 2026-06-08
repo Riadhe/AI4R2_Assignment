@@ -1,5 +1,4 @@
 (define (domain agri-continuous)
-  ;; زدنا :negative-preconditions باش يتنحى الـ Warning
   (:requirements :typing :numeric-fluents :continuous-effects :time :negative-preconditions)
   
   (:types robot location)
@@ -115,6 +114,7 @@
       (not (operating ?r))
       (not (doing-monitor ?r ?l))
       (monitored ?l)
+      (not (needs-monitor ?l))  ; <--- Consumed
     )
   )
 
@@ -127,7 +127,7 @@
       (not (operating ?r))
       (not (depleted ?r))
       (not (recharging ?r))
-    ) ; <--- القوس هذا كان ناقص
+    )
     :effect (and
       (operating ?r)
       (doing-water ?r ?l)
@@ -146,6 +146,7 @@
       (not (operating ?r))
       (not (doing-water ?r ?l))
       (watered ?l)
+      (not (needs-water ?l)) ; <--- Consumed
     )
   )
 
@@ -177,6 +178,7 @@
       (not (operating ?r))
       (not (doing-fertilize ?r ?l))
       (fertilized ?l)
+      (not (needs-fertilize ?l)) ; <--- Consumed
     )
   )
 
@@ -208,6 +210,7 @@
       (not (operating ?r))
       (not (doing-harvest ?r ?l))
       (harvested ?l)
+      (not (needs-harvest ?l)) ; <--- Consumed
     )
   )
 

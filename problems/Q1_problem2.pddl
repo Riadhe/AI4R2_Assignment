@@ -1,4 +1,4 @@
-(define (problem p2)
+(define (problem Q1_problem2)
   (:domain agri-energy)
 
   (:objects
@@ -19,8 +19,10 @@
     (connected P2 P4) (connected P4 P2)
     (connected P3 P4) (connected P4 P3)
 
+   ;; Initial numerical values
     (= (battery r1) 100)
     (= (capacity r1) 100)
+    (= (load r1) 5) ;;
 
     (= (move-cost D P1) 10)  (= (move-cost P1 D) 10)
     (= (move-cost D P2) 10)  (= (move-cost P2 D) 10)

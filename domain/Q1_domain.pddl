@@ -42,7 +42,7 @@
     ;; per-robot energy state
     (battery ?r - robot)
     (capacity ?r - robot)
-
+    (load ?r - robot)
     ;; per-edge move cost (set in the problem file, encodes terrain)
     (move-cost ?from ?to - location)
 
@@ -63,12 +63,13 @@
     :precondition (and
       (robot-at ?r ?from)
       (connected ?from ?to)
-      (>= (battery ?r) (move-cost ?from ?to))
+      ;; Energy needed is move-cost + current load penalty
+      (>= (battery ?r) (+ (move-cost ?from ?to) (load ?r)))
     )
     :effect (and
       (not (robot-at ?r ?from))
       (robot-at ?r ?to)
-      (decrease (battery ?r) (move-cost ?from ?to))
+      (decrease (battery ?r) (+ (move-cost ?from ?to) (load ?r)))
     )
   )
 
@@ -102,6 +103,7 @@
       (watered ?l)
       (not (needs-water ?l))
       (decrease (battery ?r) (op-cost-water))
+      (decrease (load ?r) 5) ;;  Robot becomes lighter after watering
     )
   )
 
@@ -116,6 +118,7 @@
       (fertilized ?l)
       (not (needs-fertilize ?l))
       (decrease (battery ?r) (op-cost-fertilize))
+      (decrease (load ?r) 5) ;; Robot becomes lighter after fertilizing
     )
   )
 
@@ -130,6 +133,7 @@
       (harvested ?l)
       (not (needs-harvest ?l))
       (decrease (battery ?r) (op-cost-harvest))
+      (increase (load ?r) 5) ;; Robot becomes heavier after harvesting
     )
   )
 
@@ -145,5 +149,4 @@
       (assign (battery ?r) (capacity ?r))
     )
   )
-
 )

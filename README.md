@@ -1,85 +1,79 @@
 #  Agricultural Robotics – Energy Constrained Field Operations🚜⚡
 
 **Course:** Artificial Intelligence for Robotics II (AI4R2)  
-**Program:** Robotics Engineering, University of Genoa (UniGe)  
 **Author:** Bahri Riadh
 
 ##  Project Overview
-This project addresses the energy management and scheduling of an agricultural robot using Automated Planning (PDDL). The robot navigates a topological map of fields (represented as a graph) to perform tasks such as monitoring, watering, fertilizing, and harvesting, while strictly managing its finite battery capacity.
+This project models a single mobile agricultural robot operating on a small field of four plots and one docking station. Each plot has exactly one operation that has to be performed there (monitoring, watering, fertilising, or harvesting), and the robot consumes energy on every move and every operation. The only place to refill the battery is the dock. The job of the planner is to find a sequence of actions that satisfies the farming goals without ever running the battery flat.
+
 
 The project is structured into two main parts:
 1. **Q1: Discrete Numeric Model** 
-2. **Q2: Continuous Time Model & PDDL+** 
+2. **Q2: Continuous Time Model with PDDL+** 
 
 ---
+## 📂 Repository Architecture
+```text
+📦 AI4R2_Assignment
+ ┣ 📂 docs          # Physical world specifications (Topology, Terrain, Energy Math)
+ ┣ 📂 domain        # PDDL domain files (Q1_domain.pddl, Q2_domain.pddl)
+ ┣ 📂 problems      # PDDL problem files with varying difficulty
+ ┣ 📂 plans         # Generated execution plans and logs
+ ┗ 📜 README.md     # Project execution guide and results analysis  
+```
 
+## 🛠️ Tools & Prerequisites
+
+To run this project, you need to set up the **ENHSP** planner. We chose ENHSP over standard classical planners (like FastDownward) simply because it natively supports both **Numeric PDDL** (required for Q1) and **Continuous PDDL+ processes and events** (required for Q2). 
+
+| Tool | Version / Source | Role |
+|------|------------------|------|
+| **Java** | 17 (or compatible) | Required to run ENHSP. |
+| **ENHSP** | `github.com/hstairs/enhsp` | The core planner handling numeric and continuous models. |
+| **VAL** | via VS Code PDDL extension | Used for plan validation. |
+| **VS Code** | + "PDDL" extension | Editor and environment setup. |
+| **Git Bash** | Windows shell | Used to run the exact execution commands provided below. |
+
+*Note: Once Java and ENHSP are set up, all execution commands in this README can be run directly as a single line in Git Bash.*
+
+---
 ##  Q1: Discrete Numeric Model
 
-In this section, we modeled the environment using classical PDDL with numeric fluents to handle the energy constraints.
+In this section, we modeled the environment using classical PDDL with numeric fluents to handle the energy constraints. 
+
+👉 *For the complete field topology, terrain classifications, and mathematical design rationale, please refer to [docs/field_model.md](./docs/field_model.md).*
 
 ### Energy Abstraction
 In this discrete numeric model, the robot's energy is abstracted using PDDL `numeric-fluents`. The current battery level and maximum capacity are defined as numeric variables `(battery ?r)` and `(capacity ?r)`. Energy consumption is discretized by assigning specific constant costs to movements (depending on terrain difficulty: flat, rough, or muddy) and to agricultural operations (e.g., monitoring, watering). 
 
 Each action includes a precondition to check for sufficient energy `(>= (battery ?r) cost)` and an effect that consumes energy using the `decrease` operator. To model battery replenishment, a `recharge` action is restricted to the Dock location, utilizing the `assign` operator to instantaneously reset the battery level to its maximum capacity. This constraint-based abstraction successfully forces the planner to account for energy limits and schedule explicit recharge actions when a naive shortest-path plan fails.
 
-###  Project Structure
-- `/docs`: Contains the mathematical and logical modeling of the field (`field_model.md`).
-- `/domain`: Contains the discrete domain file (`domain.pddl`).
-- `/problems`: Contains the problem instances (`p1.pddl` for sufficient energy, `p2.pddl` for forced recharge).
-- `/plans`: Contains the generated plans validated by VAL.
+### Execution Commands & Scenarios
 
-###  How to Run (Planning)
-To generate the plans using **ENHSP**, run the following commands from the root directory:
+Run the following commands from the repository root using Git Bash:
 
-**Problem 1 (Energy is sufficient):**
+**1. Problem 1 (Baseline - Feasible on a single charge):**
+Tests a lightweight mission (monitor P1, water P2) over flat terrain.
 ```bash
-java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain.pddl -f problems/p1.pddl
+java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem1.pddl" -s gbfs
 ```
-**Problem 2 (Recharge is required):**
+### 📊 Results & Discussion
 
-```bash
-java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain.pddl -f problems/p2.pddl
-```
-### Plan Validation (VAL)
-Both generated plans have been successfully validated using the VAL tool. To verify the plans, execute:
+#### 1. Problem 1: The Baseline (Single Charge Mission)
+**Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at Dock)`
 
-**Validate Plan 1:**
+**Analysis:** 
+This scenario establishes the baseline functionality of the navigation and discrete energy systems. The planner successfully finds a direct, sequential route to complete the mission. Because the required operations are lightweight (monitoring and watering) and the connecting paths are flat (`Dock <-> P1` and `Dock <-> P2`), the energy constraints are never violated.
 
-```bash
-"/c/Users/bahri/AppData/Roaming/Code/User/globalStorage/jan-dolejsi.pddl/val/Val-20210401.1-win64/bin/Validate.exe" domain/domain.pddl problems/p1.pddl plans/plan1.txt
-```
-**Validate Plan 2:**
+**Energy Breakdown:**
+* `move Dock P1` (flat): -10 
+* `monitor P1`: -5 
+* `move P1 Dock` (flat): -10 
+* `move Dock P2` (flat): -10 
+* `water P2`: -15 
+* `move P2 Dock` (flat): -10 
+* **Total Energy Consumed:** 60 units.
 
-```bash
-"/c/Users/bahri/AppData/Roaming/Code/User/globalStorage/jan-dolejsi.pddl/val/Val-20210401
-```
-## Problem 2 (Q2): Continuous Time & Energy Dynamics (PDDL+)
+Since 60 is well below the maximum capacity of 100, the robot completes the entire 6-step mission efficiently on a single charge without needing to trigger a `recharge` action.
 
-In this section, the discrete energy model from Q1 is upgraded to a continuous time model using PDDL+. The robot's operations and navigation are now time-dependent, and the energy consumption is handled continuously.
-
-### What has been implemented:
-* **Continuous Processes (`:process`):** Implemented background processes to continuously drain the battery while the robot is moving or operating, and to recharge it when docked.
-* **Safety Events (`:event`):** * `critical-depletion`: Automatically triggers a failure state if the battery drops to 0, forcing the planner to find safe paths.
-  * `stop-overcharge`: Automatically cuts off the recharging process when the battery reaches its maximum capacity.
-* **Action Splitting (Time Dynamics):** To bypass the ENHSP parser limitations with mixed durative actions and processes, navigation and operations were logically split into instantaneous `start` and `stop` actions managed by a continuous `time-spent` counter.
-
-### How to Run the Code
-We use the **ENHSP** planner (specifically supporting PDDL+) with the Greedy Best-First Search (`gbfs`) engine. 
-
-**Run Problem 1 (Sufficient Energy):**
-```bash
-java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain_q2.pddl -f problems/p1_q2.pddl -s gbfs
-```
-**Run Problem 2 (Recharge Required):**
-```bash
-java -jar tools/enhsp/enhsp-dist/enhsp.jar -o domain/domain_q2.pddl -f problems/p2_q2.pddl -s gbfs
-```
-### Visualizing the Plan : 
-To view the generated plans with a Gantt chart and battery consumption curves, you can use the PDDL Extension by Jan Dolejší in VS Code:
-
-Ensure the PDDL extension is installed.
-
-Set the custom planner in your settings.json with the following syntax:
-"syntax": "$(planner) -jar \"${workspaceFolder}/tools/enhsp/enhsp-dist/enhsp.jar\" -o $(domain) -f $(problem) -s gbfs"
-
-Open the problem file (p1_q2.pddl or p2_q2.pddl) and run the planner (Alt + P). Click the Visualize icon in the output panel.
+![Plan Output for Problem 1](./Q1_P1_plan.png)

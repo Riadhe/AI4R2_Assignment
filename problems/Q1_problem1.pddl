@@ -1,4 +1,4 @@
-(define (problem p1)
+(define (problem Q1_problem1)
   (:domain agri-energy)
 
   (:objects
@@ -9,6 +9,7 @@
   (:init
     (robot-at r1 D)
     (is-dock D)
+    ;; Tasks for Problem 1
     (needs-monitor P1)
     (needs-water P2)
 
@@ -17,10 +18,12 @@
     (connected P1 P3) (connected P3 P1)
     (connected P2 P4) (connected P4 P2)
     (connected P3 P4) (connected P4 P3)
-
+    
+    ;; Initial numerical values
     (= (battery r1) 100)
     (= (capacity r1) 100)
-
+    (= (load r1) 5) ;; Starts with a load of 5 for the watering task
+    
     (= (move-cost D P1) 10)  (= (move-cost P1 D) 10)
     (= (move-cost D P2) 10)  (= (move-cost P2 D) 10)
     (= (move-cost P1 P3) 20) (= (move-cost P3 P1) 20)

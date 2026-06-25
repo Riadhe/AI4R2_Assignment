@@ -1,3 +1,5 @@
+> **Files to grade — PDDL (Q1):** `codes/domain/Q1_domain.pddl` + `codes/problems/Q1_problem1.pddl`, `Q1_problem2.pddl` · **PDDL+ (Q2):** `codes/domain/Q2_domain.pddl` + `codes/problems/Q2_problem1.pddl`, `Q2_problem2.pddl`, `Q2_problem3.pddl`. Plan outputs are in `codes/plans/`. These are the final, correct versions.
+
 #  Agricultural Robotics – Energy Constrained Field Operations🚜⚡
 
 **Course:** Artificial Intelligence for Robotics II (AI4R2)  
@@ -15,11 +17,14 @@ The project is structured into two main parts:
 ## 📂 Repository Architecture
 ```text
 📦 AI4R2_Assignment
- ┣ 📂 domain        # PDDL domain files (Q1_domain.pddl, Q2_domain.pddl)
- ┣ 📂 problems      # PDDL problem files (Q1_problem1/2, Q2_problem1/2/3)
- ┣ 📂 plans         # Generated execution plans (Q1_plan1/2, Q2_plan1/2/3)
- ┣ 📜 AI4R2_Project_Report.pdf  # Full academic report
- ┗ 📜 README.md     # Project execution guide and results summary
+ ┣ 📂 codes
+ ┃   ┣ 📂 domain      # PDDL domain files (Q1_domain.pddl, Q2_domain.pddl)
+ ┃   ┣ 📂 problems    # PDDL problem files (Q1_problem1/2, Q2_problem1/2/3)
+ ┃   ┗ 📂 plans       # Generated execution plans (Q1_plan1/2, Q2_plan1/2/3)
+ ┣ 📂 Report
+ ┃   ┗ 📜 AI4R2_Project_Report.pdf   # Full academic report
+ ┣ 📂 slide          # Presentation slides
+ ┗ 📜 README.md       # Project execution guide and results summary
 ```
 
 ## 🛠️ Tools & Prerequisites
@@ -51,7 +56,7 @@ Run the following commands from the repository root using Git Bash:
 ### 1. Problem 1 (Baseline - Feasible on a single charge)
 Tests a lightweight mission (monitor P1, water P2) over low-cost edges.
 ```bash
-java -jar "enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem1.pddl" -s gbfs
+java -jar "enhsp.jar" -o "codes/domain/Q1_domain.pddl" -f "codes/problems/Q1_problem1.pddl" -s gbfs
 ```
 **Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at r1 D)`
 **Result:** The robot completes the mission on a single charge (final battery 25/100) without needing to recharge.
@@ -60,7 +65,7 @@ java -jar "enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem1.pddl" 
 Tests a heavy mission (fertilize P3, harvest P4). The round trip exceeds the 100-unit battery, so the goal is **unreachable without recharging**.
 
 ```bash
-java -jar "enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem2.pddl" -s gbfs
+java -jar "enhsp.jar" -o "codes/domain/Q1_domain.pddl" -f "codes/problems/Q1_problem2.pddl" -s gbfs
 ```
 **Goal:** `(fertilized P3) ∧ (harvested P4) ∧ (robot-at r1 D)`
 **Result:** The planner cannot reach the goal on the direct route under the 100-unit battery limit, so it autonomously inserts a `recharge` action at the Dock mid-mission and outputs an 11-step plan.
@@ -77,7 +82,7 @@ Run the following commands to test the different continuous time scenarios.
 ### Problem 1: Continuous Baseline
 Testing basic continuous execution with start/stop actions, timed processes, and flat terrain.
 ```bash
-java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem1.pddl" -s gbfs
+java -jar "enhsp.jar" -o "codes/domain/Q2_domain.pddl" -f "codes/problems/Q2_problem1.pddl" -s gbfs
 ```
 **Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
 **Result:** The robot completes the mission while continuously draining energy based on the duration of each move and operation, finishing with 45 units left.
@@ -86,7 +91,7 @@ java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem1.pddl" 
 Testing a heavy mission (fertilize P3, harvest P4) across muddy edges, where the continuous high-drain rate forces a recharge at the dock before the mission can complete.
 
 ```bash
-java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem2.pddl" -s gbfs
+java -jar "enhsp.jar" -o "codes/domain/Q2_domain.pddl" -f "codes/problems/Q2_problem2.pddl" -s gbfs
 ```
 **Goal:** `(fertilized P3) ∧ (harvested P4) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
 **Result:** The robot drains heavily on the muddy legs, returns to the dock, and recharges via the continuous `recharge-battery` process. The `stop-overcharge` event clips the battery at 100 max capacity, allowing the mission to resume safely.
@@ -95,7 +100,7 @@ java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem2.pddl" 
 Forcing the planner to weigh a short high-drain muddy edge against a longer low-drain flat path via waypoint W1.
 
 ```bash
-java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem3.pddl" -s gbfs
+java -jar "enhsp.jar" -o "codes/domain/Q2_domain.pddl" -f "codes/problems/Q2_problem3.pddl" -s gbfs
 ```
 **Goal:** `(harvested P1) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
 **Result:** Minimizing total time, the planner takes the fast muddy edge inbound (while the robot is light) and the flat W1 detour outbound (once the harvested load makes muddy travel costlier), surviving with 5 units to spare. The same edge thus carries a different energy cost depending on duration and load — the defining feature of the continuous model.
@@ -103,10 +108,8 @@ java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem3.pddl" 
 ---
 ## 📄 Detailed Analysis & Report
 
-This README serves as the execution manual. For the comprehensive academic analysis, please refer to the **Project Report**. The report includes the mathematical models of the field, step-by-step energy traces, and an in-depth discussion covering:
+This README serves as the execution manual. For the comprehensive academic analysis, see **[Report/AI4R2_Project_Report.pdf](./Report/AI4R2_Project_Report.pdf)**. The report covers:
 
 * **Discrete vs. continuous energy modelling.**
 * **The interaction between route planning and resource management.**
 * **Why energy constraints are central in long-horizon robotic autonomy.**
-
-👉 **Read the full project report here: [AI4R2_Project_Report.pdf](./AI4R2_Project_Report.pdf)**

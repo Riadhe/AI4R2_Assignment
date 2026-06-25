@@ -22,7 +22,7 @@ The project is structured into two main parts:
  ┃   ┣ 📂 problems    # PDDL problem files (Q1_problem1/2, Q2_problem1/2/3)
  ┃   ┗ 📂 plans       # Generated execution plans (Q1_plan1/2, Q2_plan1/2/3)
  ┣ 📂 Report
- ┃   ┗ 📜 AI4R2_Project_Report.pdf   # Full academic report
+ ┃   ┗ 📜 AI4R2_Project_Report.pdf   # Full report
  ┣ 📂 slide          # Presentation slides
  ┗ 📜 README.md       # Project execution guide and results summary
 ```

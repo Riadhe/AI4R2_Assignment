@@ -38,6 +38,7 @@
     (battery ?r - robot)
     (capacity ?r - robot)
     (time-spent ?r - robot) 
+    (load ?r - robot) 
     
     (move-time ?from ?to - location)
     (op-time-monitor)
@@ -73,7 +74,7 @@
     :precondition (and
       (moving ?r)
       (going ?r ?from ?to)
-      (>= (time-spent ?r) (move-time ?from ?to)) 
+      (= (time-spent ?r) (move-time ?from ?to)) ; <--- Strict Timing!
     )
     :effect (and
       (not (moving ?r))
@@ -108,13 +109,13 @@
     :precondition (and
       (operating ?r)
       (doing-monitor ?r ?l)
-      (>= (time-spent ?r) (op-time-monitor))
+      (= (time-spent ?r) (op-time-monitor)) ; <--- Strict Timing!
     )
     :effect (and
       (not (operating ?r))
       (not (doing-monitor ?r ?l))
       (monitored ?l)
-      (not (needs-monitor ?l))  ; <--- Consumed
+      (not (needs-monitor ?l)) 
     )
   )
 
@@ -140,13 +141,14 @@
     :precondition (and
       (operating ?r)
       (doing-water ?r ?l)
-      (>= (time-spent ?r) (op-time-water))
+      (= (time-spent ?r) (op-time-water)) ; <--- Strict Timing!
     )
     :effect (and
       (not (operating ?r))
       (not (doing-water ?r ?l))
       (watered ?l)
-      (not (needs-water ?l)) ; <--- Consumed
+      (not (needs-water ?l)) 
+      (decrease (load ?r) 5) 
     )
   )
 
@@ -172,13 +174,14 @@
     :precondition (and
       (operating ?r)
       (doing-fertilize ?r ?l)
-      (>= (time-spent ?r) (op-time-fertilize))
+      (= (time-spent ?r) (op-time-fertilize)) ; <--- Strict Timing!
     )
     :effect (and
       (not (operating ?r))
       (not (doing-fertilize ?r ?l))
       (fertilized ?l)
-      (not (needs-fertilize ?l)) ; <--- Consumed
+      (not (needs-fertilize ?l)) 
+      (decrease (load ?r) 5) 
     )
   )
 
@@ -204,13 +207,14 @@
     :precondition (and
       (operating ?r)
       (doing-harvest ?r ?l)
-      (>= (time-spent ?r) (op-time-harvest))
+      (= (time-spent ?r) (op-time-harvest)) ; <--- Strict Timing!
     )
     :effect (and
       (not (operating ?r))
       (not (doing-harvest ?r ?l))
       (harvested ?l)
-      (not (needs-harvest ?l)) ; <--- Consumed
+      (not (needs-harvest ?l)) 
+      (increase (load ?r) 5) 
     )
   )
 
@@ -249,7 +253,7 @@
     )
     :effect (and
       (increase (time-spent ?r) (* #t 1.0)) 
-      (decrease (battery ?r) (* #t 5.0)) 
+      (decrease (battery ?r) (* #t (+ 5.0 (load ?r)))) 
     )
   )
 
@@ -262,7 +266,7 @@
     )
     :effect (and
       (increase (time-spent ?r) (* #t 1.0)) 
-      (decrease (battery ?r) (* #t 15.0)) 
+      (decrease (battery ?r) (* #t (+ 15.0 (load ?r)))) 
     )
   )
 

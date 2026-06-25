@@ -10,7 +10,7 @@
     (robot-at r1 D)
     (is-dock D)
 
-    ;; 1. Flags for needed operations (The "Consume" logic)
+    ;; 1. Flags for needed operations
     (needs-fertilize P3)
     (needs-harvest P4)
 
@@ -23,19 +23,20 @@
     ;; 3. Terrain Types (Mixed: flat and muddy)
     (flat D P1) (flat P1 D)
     (flat D P2) (flat P2 D)
-    (muddy P1 P3) (muddy P3 P1) ; Muddy = 15.0 discharge rate
-    (muddy P2 P4) (muddy P4 P2) ; Muddy = 15.0 discharge rate
+    (muddy P1 P3) (muddy P3 P1) 
+    (muddy P2 P4) (muddy P4 P2) 
 
     ;; 4. Initial Numeric Values
     (= (battery r1) 100.0)
     (= (capacity r1) 100.0)
     (= (time-spent r1) 0.0)
+    (= (load r1) 5.0) 
 
-    ;; 5. Move Times (Durations)
+    ;; 5. Move Times (Durations) - FIXED TO MATCH ENERGY BUDGET
     (= (move-time D P1) 1.0) (= (move-time P1 D) 1.0)
     (= (move-time D P2) 1.0) (= (move-time P2 D) 1.0)
-    (= (move-time P1 P3) 2.0) (= (move-time P3 P1) 2.0)
-    (= (move-time P2 P4) 2.0) (= (move-time P4 P2) 2.0)
+    (= (move-time P1 P3) 1.0) (= (move-time P3 P1) 1.0) 
+    (= (move-time P2 P4) 1.0) (= (move-time P4 P2) 1.0) 
 
     ;; 6. Operation Times
     (= (op-time-monitor) 1.0)
@@ -48,6 +49,8 @@
     (fertilized P3)
     (harvested P4)
     (robot-at r1 D)
-    (not (depleted r1)) ; Safety constraint
+    (not (depleted r1)) 
   ))
+  
+  (:metric minimize (total-time))
 )

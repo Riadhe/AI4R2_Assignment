@@ -8,18 +8,18 @@ This project models a single mobile agricultural robot operating on a small fiel
 
 
 The project is structured into two main parts:
-1. **Q1: Discrete Numeric Model** 
-2. **Q2: Continuous Time Model with PDDL+** 
+1. **Q1: Discrete Numeric Model**
+2. **Q2: Continuous Time Model (PDDL+)**
 
 ---
 ## 📂 Repository Architecture
 ```text
 📦 AI4R2_Assignment
- ┣ 📂 docs          # Physical world specifications (Topology, Terrain, Energy Math)
  ┣ 📂 domain        # PDDL domain files (Q1_domain.pddl, Q2_domain.pddl)
- ┣ 📂 problems      # PDDL problem files with varying difficulty
- ┣ 📂 plans         # Generated execution plans and logs
- ┗ 📜 README.md     # Project execution guide and results analysis  
+ ┣ 📂 problems      # PDDL problem files (Q1_problem1/2, Q2_problem1/2/3)
+ ┣ 📂 plans         # Generated execution plans (Q1_plan1/2, Q2_plan1/2/3)
+ ┣ 📜 AI4R2_Project_Report.pdf  # Full academic report
+ ┗ 📜 README.md     # Project execution guide and results summary
 ```
 
 ## 🛠️ Tools & Prerequisites
@@ -34,82 +34,71 @@ To run this project, you need to set up the **ENHSP** planner. We chose ENHSP ov
 | **VS Code** | + "PDDL" extension | Editor and environment setup. |
 | **Git Bash** | Windows shell | Used to run the exact execution commands provided below. |
 
-*Note: Once Java and ENHSP are set up, all execution commands in this README can be run directly as a single line in Git Bash.*
+*Note: Once Java and ENHSP are set up, all execution commands in this README can be run directly as a single line in Git Bash. The commands below assume `enhsp.jar` sits in the repository root — adjust the path if your jar lives elsewhere.*
 
 ---
 
 
 ##  Q1: Discrete Numeric Model
 
-In this baseline model, energy is abstracted as a discrete numeric fluent. Actions dynamically subtract predefined energy costs based on operation weights and terrain types.
+In this baseline model, energy is abstracted as a discrete numeric fluent. Actions subtract predefined energy costs based on operation weights and edge costs, and the load carried by the robot adds to every move.
 
 ⚠️ **Note:** *For the complete theoretical model, PDDL abstraction details, energy traces, and VAL validation, please refer to the **Project Report**.*
-👉 *For the field topology and math rationale, see [docs/field_model.md](./docs/field_model.md).*
 
 ### Execution Commands & Outputs
 Run the following commands from the repository root using Git Bash:
 
 ### 1. Problem 1 (Baseline - Feasible on a single charge)
-Tests a lightweight mission (monitor P1, water P2) over flat terrain.
+Tests a lightweight mission (monitor P1, water P2) over low-cost edges.
 ```bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem1.pddl" -s gbfs
+java -jar "enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem1.pddl" -s gbfs
 ```
-**Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at Dock)`
-**Result:** The robot completes the 6-step mission on a single charge (consumes 60/100 energy units) without needing to recharge.
-### 2. Problem 2 (Energy Bottleneck - Recharge Required)
-Tests a heavy mission (fertilize P3, harvest P4) forcing the robot to cross the highly expensive muddy path.
+**Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at r1 D)`
+**Result:** The robot completes the mission on a single charge (final battery 25/100) without needing to recharge.
 
-```Bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem2.pddl" -s gbfs
+### 2. Problem 2 (Recharge Required)
+Tests a heavy mission (fertilize P3, harvest P4). The round trip exceeds the 100-unit battery, so the goal is **unreachable without recharging**.
+
+```bash
+java -jar "enhsp.jar" -o "domain/Q1_domain.pddl" -f "problems/Q1_problem2.pddl" -s gbfs
 ```
-**Goal:** `(fertilized P3) ∧ (harvested P4) ∧ (robot-at Dock)`
-**Result:** The planner detects a dead-end on the direct route due to the 100-unit battery limit, autonomously inserts a recharge action at the Dock mid-mission, and outputs an 11-step plan.
+**Goal:** `(fertilized P3) ∧ (harvested P4) ∧ (robot-at r1 D)`
+**Result:** The planner cannot reach the goal on the direct route under the 100-unit battery limit, so it autonomously inserts a `recharge` action at the Dock mid-mission and outputs an 11-step plan.
+
 ##  Q2: Continuous Time Model (PDDL+)
 
-In this advanced formulation, the discrete energy jumps from Q1 are replaced with continuous temporal dynamics. Energy is consumed over time via PDDL+ `process` constructs (e.g., navigating a muddy path drains energy at a continuous rate per second). We also introduced autonomous `events` to handle battery overcharge protection.
+In this advanced formulation, the discrete energy jumps from Q1 are replaced with continuous temporal dynamics. Energy is consumed over time via PDDL+ `process` constructs (e.g., navigating a muddy path drains energy at a continuous rate per second). We also introduced autonomous `events`: one clips the battery at maximum capacity during recharge, and one fires on critical battery depletion.
 
-⚠️ **Note:** *For the full PDDL+ architecture, timeline analysis, and algorithm benchmarking (A\* vs GBFS), please refer to the **Project Report**.*
+⚠️ **Note:** *For the full PDDL+ architecture and timeline analysis, please refer to the **Project Report**.*
 
 ### Execution Commands & Experiments
 Run the following commands to test the different continuous time scenarios. 
 
-### Experiment 1: Continuous Baseline
-Testing basic continuous execution with wait times and flat terrain.
+### Problem 1: Continuous Baseline
+Testing basic continuous execution with start/stop actions, timed processes, and flat terrain.
 ```bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_exp1.pddl" -s gbfs
+java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem1.pddl" -s gbfs
 ```
-**Result:** The robot completes the mission while continuously draining energy based on the duration of its moves and operations.
+**Goal:** `(monitored P1) ∧ (watered P2) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
+**Result:** The robot completes the mission while continuously draining energy based on the duration of each move and operation, finishing with 45 units left.
 
-### Experiment 2: The Recharge Event
-Testing battery replenishment and the autonomous stop-overcharge event.
+### Problem 2: Muddy Mission & Recharge
+Testing a heavy mission (fertilize P3, harvest P4) across muddy edges, where the continuous high-drain rate forces a recharge at the dock before the mission can complete.
 
-```Bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_exp2.pddl" -s gbfs
+```bash
+java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem2.pddl" -s gbfs
 ```
-**Result:** The robot halts at the dock to charge. The background PDDL+ event successfully clips the battery at 100 max capacity, allowing the mission to resume safely.
+**Goal:** `(fertilized P3) ∧ (harvested P4) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
+**Result:** The robot drains heavily on the muddy legs, returns to the dock, and recharges via the continuous `recharge-battery` process. The `stop-overcharge` event clips the battery at 100 max capacity, allowing the mission to resume safely.
 
-### Experiment 3: Route Planning (Muddy vs Flat)
-Forcing the planner to choose between a short, continuous high-drain path (Muddy) and a longer, low-drain path (Flat Detour via W1).
+### Problem 3: Route Planning (Muddy vs Flat Detour)
+Forcing the planner to weigh a short high-drain muddy edge against a longer low-drain flat path via waypoint W1.
 
-```Bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_exp3.pddl" -s gbfs
+```bash
+java -jar "enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_problem3.pddl" -s gbfs
 ```
-**Result:** The planner autonomously avoids the muddy path to prevent fatal energy drain, opting for the safer W1 waypoint.
-
-### Experiment 4: Algorithm Benchmarking (GBFS vs A*)
-Comparing Sub-optimal greedy search vs Optimal search on a complex continuous problem.
-
-Run with GBFS (Fast but sub-optimal):
-
-```Bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_exp4.pddl" -s gbfs
-```
-Run with Weighted A* (Slower but optimal duration):
-
-```Bash
-java -jar "tools/enhsp/enhsp-dist/enhsp.jar" -o "domain/Q2_domain.pddl" -f "problems/Q2_exp4.pddl" -s wa-star
-```
-**Result:** WA* yields a tighter schedule with minimized idle times compared to GBFS, proving the efficacy of optimal search in continuous domains.
+**Goal:** `(harvested P1) ∧ (robot-at r1 D) ∧ (not (depleted r1))`
+**Result:** Minimizing total time, the planner takes the fast muddy edge inbound (while the robot is light) and the flat W1 detour outbound (once the harvested load makes muddy travel costlier), surviving with 5 units to spare. The same edge thus carries a different energy cost depending on duration and load — the defining feature of the continuous model.
 
 ---
 ## 📄 Detailed Analysis & Report
@@ -120,4 +109,4 @@ This README serves as the execution manual. For the comprehensive academic analy
 * **The interaction between route planning and resource management.**
 * **Why energy constraints are central in long-horizon robotic autonomy.**
 
-👉 **Read the full project report here: [AI4R2_Assignment_Report.pdf](./AI4R2_Project_Report.pdf)** 
+👉 **Read the full project report here: [AI4R2_Project_Report.pdf](./AI4R2_Project_Report.pdf)**

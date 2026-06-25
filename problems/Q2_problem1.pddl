@@ -30,6 +30,7 @@
     (= (battery r1) 100.0)
     (= (capacity r1) 100.0)
     (= (time-spent r1) 0.0)
+    (= (load r1) 5.0) ;; <--- Zidneha houni
 
     ;; 5. Move Times (Durations)
     (= (move-time D P1) 1.0) (= (move-time P1 D) 1.0)
@@ -50,4 +51,6 @@
     (robot-at r1 D)
     (not (depleted r1)) ; Safety constraint
   ))
+(:metric minimize (total-time))
+
 )

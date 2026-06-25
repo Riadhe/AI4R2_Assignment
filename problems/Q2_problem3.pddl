@@ -27,22 +27,25 @@
     (= (battery r1) 100.0)
     (= (capacity r1) 100.0)
     (= (time-spent r1) 0.0)
+    (= (load r1) 5.0) 
 
-    ;; Move Times (Durations)
-    (= (move-time D P1) 4.0) (= (move-time P1 D) 4.0)       ; 4 secs (Muddy = 60 energy)
-    (= (move-time D W1) 2.0) (= (move-time W1 D) 2.0)       ; 2 secs (Flat = 10 energy)
-    (= (move-time W1 P1) 3.0) (= (move-time P1 W1) 3.0)     ; 3 secs (Flat = 15 energy)
+    ;; Move Times (FIXED: Balanced for Energy Budget)
+    (= (move-time D P1) 2.0) (= (move-time P1 D) 2.0)       ; Muddy takes 2s (Total Energy = 115 -> DEAD)
+    (= (move-time D W1) 1.0) (= (move-time W1 D) 1.0)       ; Flat part 1 takes 1s
+    (= (move-time W1 P1) 1.0) (= (move-time P1 W1) 1.0)     ; Flat part 2 takes 1s (Total Flat = 75 -> SURVIVES)
 
     ;; Operation Times
     (= (op-time-monitor) 1.0)
     (= (op-time-water) 3.0)
     (= (op-time-fertilize) 4.0)
-    (= (op-time-harvest) 5.0)                               ; 5 secs (Flat = 25 energy)
+    (= (op-time-harvest) 5.0) 
   )
   
   (:goal (and
     (harvested P1)
     (robot-at r1 D)
-    (not (depleted r1)) ; Must survive
+    (not (depleted r1)) 
   ))
+  
+  (:metric minimize (total-time)) 
 )

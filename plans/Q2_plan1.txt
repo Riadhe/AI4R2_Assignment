@@ -1,0 +1,18 @@
+0: (start-move r1 D P1)
+0: -----waiting---- [1.0]
+1.0: (stop-move r1 D P1)
+1.0: (start-monitor r1 P1)
+1.0: -----waiting---- [2.0]
+2.0: (stop-monitor r1 P1)
+2.0: (start-move r1 P1 D)
+2.0: -----waiting---- [3.0]
+3.0: (stop-move r1 P1 D)
+3.0: (start-move r1 D P2)
+3.0: -----waiting---- [4.0]
+4.0: (stop-move r1 D P2)
+4.0: (start-water r1 P2)
+4.0: -----waiting---- [7.0]
+7.0: (stop-water r1 P2)
+7.0: (start-move r1 P2 D)
+7.0: -----waiting---- [8.0]
+8.0: (stop-move r1 P2 D)

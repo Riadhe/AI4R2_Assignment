@@ -1,0 +1,33 @@
+0: (start-move r1 D P1)
+0: -----waiting---- [1.0]
+1.0: (stop-move r1 D P1)
+1.0: (start-move r1 P1 P3)
+1.0: -----waiting---- [2.0]
+2.0: (stop-move r1 P1 P3)
+2.0: (start-fertilize r1 P3)
+2.0: -----waiting---- [6.0]
+6.0: (stop-fertilize r1 P3)
+6.0: (start-move r1 P3 P1)
+6.0: -----waiting---- [7.0]
+7.0: (stop-move r1 P3 P1)
+7.0: (start-move r1 P1 D)
+7.0: -----waiting---- [8.0]
+8.0: (stop-move r1 P1 D)
+8.0: (start-recharging r1 D)
+8.0: -----waiting---- [10.0]
+10.0: (stop-recharging r1)
+10.0: (start-move r1 D P2)
+10.0: -----waiting---- [11.0]
+11.0: (stop-move r1 D P2)
+11.0: (start-move r1 P2 P4)
+11.0: -----waiting---- [12.0]
+12.0: (stop-move r1 P2 P4)
+12.0: (start-harvest r1 P4)
+12.0: -----waiting---- [17.0]
+17.0: (stop-harvest r1 P4)
+17.0: (start-move r1 P4 P2)
+17.0: -----waiting---- [18.0]
+18.0: (stop-move r1 P4 P2)
+18.0: (start-move r1 P2 D)
+18.0: -----waiting---- [19.0]
+19.0: (stop-move r1 P2 D)

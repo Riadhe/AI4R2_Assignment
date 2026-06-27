@@ -29,10 +29,10 @@
     (= (time-spent r1) 0.0)
     (= (load r1) 5.0) 
 
-    ;; Move Times (FIXED: Balanced for Energy Budget)
-    (= (move-time D P1) 2.0) (= (move-time P1 D) 2.0)       ; Muddy takes 2s (Total Energy = 115 -> DEAD)
-    (= (move-time D W1) 1.0) (= (move-time W1 D) 1.0)       ; Flat part 1 takes 1s
-    (= (move-time W1 P1) 1.0) (= (move-time P1 W1) 1.0)     ; Flat part 2 takes 1s (Total Flat = 75 -> SURVIVES)
+    ;; Move Times (balanced for Energy Budget)
+    (= (move-time D P1) 2.0) (= (move-time P1 D) 2.0)       ; Muddy direct edge : 2s
+    (= (move-time D W1) 1.0) (= (move-time W1 D) 1.0)       ; Flat detour leg 1 (D-W1) , 1s
+    (= (move-time W1 P1) 1.0) (= (move-time P1 W1) 1.0)     ; Flat detour leg 2(W1-P1) :1s 
 
     ;; Operation Times
     (= (op-time-monitor) 1.0)

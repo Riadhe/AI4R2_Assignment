@@ -30,7 +30,7 @@
     (= (battery r1) 100.0)
     (= (capacity r1) 100.0)
     (= (time-spent r1) 0.0)
-    (= (load r1) 5.0) ;; <--- Zidneha houni
+    (= (load r1) 5.0) ;; initial payload
 
     ;; 5. Move Times (Durations)
     (= (move-time D P1) 1.0) (= (move-time P1 D) 1.0)

@@ -113,3 +113,5 @@ This README serves as the execution manual. For the comprehensive academic analy
 * **Discrete vs. continuous energy modelling.**
 * **The interaction between route planning and resource management.**
 * **Why energy constraints are central in long-horizon robotic autonomy.**
+## Observation
+The submitted codes and report have been thoroughly reviewed by the teaching assistant, Omar Kashmar.
